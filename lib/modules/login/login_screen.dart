@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meme_lord/modules/dashboard/dashboard_screen.dart';
+import 'package:flutter_meme_lord/modules/signup/signup_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,6 +19,12 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const Dashboard()),
+    );
+  }
+  void onSignUpClick (context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SignupScreen()),
     );
   }
   Future<bool> onWillPop() {
@@ -67,11 +74,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 Container(
                   child:  Column(
-                    children: const [
-                      Text("Don't have an account"),
-                      Text("Sign Up", style: TextStyle(
-                          color: Colors.deepPurple),
-                      ),
+                    children: [
+                      const Text("Don't have an account"),
+                      InkWell(onTap: () => onSignUpClick(context),
+                        child: const Text("Sign Up", style: TextStyle(
+                            color: Colors.deepPurple),
+                        )
+                        ,),
+
                     ],
                   ),
                   margin: const EdgeInsets.only(top: 28),

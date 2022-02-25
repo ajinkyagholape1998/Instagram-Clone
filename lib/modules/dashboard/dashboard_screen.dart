@@ -9,6 +9,8 @@ import 'package:flutter_meme_lord/modules/search/search.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:pusher_client/pusher_client.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
 
@@ -24,7 +26,8 @@ class _DashboardState extends State<Dashboard> {
   late int pageNumber = 1;
 
   Future<List<Post>> _fetchPosts() async {
-    final response = await http.get(Uri.parse(API_URL+pageNumber.toString()));
+    // final response = await http.get(Uri.parse(API_URL+pageNumber.toString()));
+    final response = await http.get(Uri.parse(API_URL));
     if (response.statusCode == 200) {
       List<dynamic> jsonResponse = json.decode(response.body)["results"];
       List<Post> postList = [];
@@ -76,9 +79,40 @@ class _DashboardState extends State<Dashboard> {
       _isLoadMoreRunning = false;
       _controller = ScrollController()..addListener(_fetchMorePosts);
     });
+
+    PusherOptions options = PusherOptions(
+      host: 'localhost',
+      // wsPort: 6001,
+      encrypted: false,
+      // auth: PusherAuth(
+      //   'http://example.com/auth',
+      //   headers: {
+      //     'Authorization': 'Bearer $token',
+      //   },
+      // ),
+    );
+
+    PusherClient pusher = PusherClient(
+        getPusherToken(),
+        options,
+        autoConnect: false
+    );
+
+    Channel channel = pusher.subscribe("private-orders");
+
+    pusher.onConnectionStateChange((state) {
+      print("previousState: ${state!.previousState}, currentState: ${state!.currentState}");
+    });
+
+    pusher.onConnectionError((error) {
+      print("error: ${error!.message}");
+    });
+
+    channel.bind('message', (event) {
+      print("message => ${event!.data}");
+    });
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
